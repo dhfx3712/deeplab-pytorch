@@ -77,7 +77,9 @@ def resize_labels(labels, size):
     new_labels = []
     for label in labels:
         label = label.float().numpy()
+        print (f'resize_bf : {np.shape(label)} ,size : {size}')
         label = Image.fromarray(label).resize(size, resample=Image.NEAREST)
+        print(f'resize_af : {np.shape(label)}')
         new_labels.append(np.asarray(label))
     new_labels = torch.LongTensor(new_labels)
     return new_labels
@@ -123,7 +125,8 @@ def train(config_path, cuda):
         base_size=CONFIG.IMAGE.SIZE.BASE,
         crop_size=CONFIG.IMAGE.SIZE.TRAIN,
         scales=CONFIG.DATASET.SCALES,
-        flip=True,
+        flip=False,
+        year=2007,
     )
     print(dataset)
 
@@ -223,9 +226,10 @@ def train(config_path, cuda):
             except:
                 loader_iter = iter(loader)
                 _, images, labels = next(loader_iter)
-
+            print (f'images_shape : {images.shape}, labels : {labels.shape}')
             # Propagate forward
             logits = model(images.to(device))
+            print (f'logists_len  : {len(logits)},{logits[0].shape}')
 
             # Loss
             iter_loss = 0
@@ -318,6 +322,7 @@ def test(config_path, model_path, cuda):
         ignore_label=CONFIG.DATASET.IGNORE_LABEL,
         mean_bgr=(CONFIG.IMAGE.MEAN.B, CONFIG.IMAGE.MEAN.G, CONFIG.IMAGE.MEAN.R),
         augment=False,
+        year=2007,
     )
     print(dataset)
 
@@ -386,6 +391,8 @@ def test(config_path, model_path, cuda):
 
         preds += list(labels.cpu().numpy())
         gts += list(gt_labels.numpy())
+        print (f'gt_label_set : {set(gt_labels.numpy().flatten())}')
+        print(f'pred_label_set : {set(labels.cpu().numpy().flatten())}')
 
     # Pixel Accuracy, Mean Accuracy, Class IoU, Mean IoU, Freq Weighted IoU
     score = scores(gts, preds, n_class=CONFIG.DATASET.N_CLASSES)
@@ -427,6 +434,7 @@ def crf(config_path, n_jobs):
         ignore_label=CONFIG.DATASET.IGNORE_LABEL,
         mean_bgr=(CONFIG.IMAGE.MEAN.B, CONFIG.IMAGE.MEAN.G, CONFIG.IMAGE.MEAN.R),
         augment=False,
+        year=2007,
     )
     print(dataset)
 

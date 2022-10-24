@@ -5,7 +5,8 @@ import numpy as np
 
 
 def _fast_hist(label_true, label_pred, n_class):
-    mask = (label_true >= 0) & (label_true < n_class)
+    mask = (label_true >= 0) & (label_true < n_class) #剔除255像素
+    #label_true[mask].astype(int)真实样本的编号，n_class * 真实样本编号表示混淆矩阵的第几个行。label_pred[mask]表示预测标签是否在对角线上
     hist = np.bincount(
         n_class * label_true[mask].astype(int) + label_pred[mask],
         minlength=n_class ** 2,
@@ -14,6 +15,7 @@ def _fast_hist(label_true, label_pred, n_class):
 
 
 def scores(label_trues, label_preds, n_class):
+    print (f'scores_lb_shape : lt-{np.shape(label_trues)},lp-{np.shape(label_preds)},lp[0]-{np.shape(label_preds[0])}') #scores_lb_shape : lb-(15,),lp-(15,)
     hist = np.zeros((n_class, n_class))
     for lt, lp in zip(label_trues, label_preds):
         hist += _fast_hist(lt.flatten(), lp.flatten(), n_class)

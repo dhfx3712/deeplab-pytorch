@@ -36,6 +36,10 @@ class VOC(_BaseDataset):
             file_list = osp.join(
                 self.root, "ImageSets/Segmentation", self.split + ".txt"
             )
+            if self.split == 'val':
+                file_list = osp.join(
+                    self.root, "ImageSets/Segmentation", self.split + '_mini' + ".txt"
+                )
             file_list = tuple(open(file_list, "r"))
             file_list = [id_.rstrip() for id_ in file_list]
             self.files = file_list

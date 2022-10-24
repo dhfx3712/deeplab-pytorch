@@ -39,3 +39,12 @@ if __name__ == "__main__":
     print(model)
     print("input:", image.shape)
     print("output:", model(image).shape)
+
+'''
+
+input: torch.Size([1, 3, 513, 513])
+/Users/admin/opt/anaconda3/envs/tf2.7/lib/python3.7/site-packages/torch/nn/functional.py:780: UserWarning: Note that order of the arguments: ceil_mode and return_indices will changeto match the args list in nn.MaxPool2d in a future release.
+  warnings.warn("Note that order of the arguments: ceil_mode and return_indices will change"
+output: torch.Size([1, 21, 65, 65])
+ 
+'''

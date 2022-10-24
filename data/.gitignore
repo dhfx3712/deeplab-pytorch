@@ -4,3 +4,4 @@
 *.npy
 *.prototxt
 *.zip
+events*
