@@ -161,16 +161,16 @@ def single(config_path, model_path, image_path, cuda, crf):
     # Show result for each class
     rows = np.floor(np.sqrt(len(labels) + 1))
     cols = np.ceil((len(labels) + 1) / rows)
-
+    print(f'row : {rows} , cols : {cols}')
     plt.figure(figsize=(10, 10))
-    ax = plt.subplot(rows, cols, 1)
+    ax = plt.subplot(int(rows), int(cols), 1)
     ax.set_title("Input image")
     ax.imshow(raw_image[:, :, ::-1])
     ax.axis("off")
 
     for i, label in enumerate(labels):
         mask = labelmap == label
-        ax = plt.subplot(rows, cols, i + 2)
+        ax = plt.subplot(int(rows), int(cols), i + 2)
         ax.set_title(classes[label])
         ax.imshow(raw_image[..., ::-1])
         ax.imshow(mask.astype(np.float32), alpha=0.5)
