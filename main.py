@@ -85,6 +85,30 @@ def resize_labels(labels, size):
     return new_labels
 
 
+import pydensecrf.densecrf as dcrf
+import numpy as np
+from PIL import Image
+from torch.autograd import Variable
+def train_crf(w,h,cl,logit,img):
+
+    im = np.random.randint(255,size=(w,h,3))
+    im = im.astype(np.uint8)
+
+    d = dcrf.DenseCRF2D(w, h, cl)  # width, height, nlabels
+    U = logit.detach().numpy().reshape((cl, -1))  # Needs to be flat.
+    d.setUnaryEnergy(U)
+    d.addPairwiseGaussian(sxy=3, compat=3)
+    d.addPairwiseBilateral(sxy=80, srgb=13, rgbim=im, compat=10)
+    Q = d.inference(5)
+    Q = np.array(Q)
+    Q = Q[np.newaxis,...]
+    Q = torch.Tensor(Q)
+    Q = Q.view(1,21,w,h)
+    Q = Variable(Q, requires_grad=True)
+    print (f'crf_Q : {Q.shape}')
+    return Q
+
+
 @click.group()
 @click.pass_context
 def main(ctx):
@@ -233,11 +257,18 @@ def train(config_path, cuda):
 
             # Loss
             iter_loss = 0
-            for logit in logits:
+            # for logit in logits:
+            #     # Resize labels for {100%, 75%, 50%, Max} logits
+            #     _, _, H, W = logit.shape
+            #     labels_ = resize_labels(labels, size=(H, W))
+            #     iter_loss += criterion(logit, labels_.to(device))
+
+            for logit in logits[0:1]:
                 # Resize labels for {100%, 75%, 50%, Max} logits
                 _, _, H, W = logit.shape
                 labels_ = resize_labels(labels, size=(H, W))
-                iter_loss += criterion(logit, labels_.to(device))
+                crf_lb = train_crf(W,H,21,logit,labels_)
+                iter_loss += criterion(crf_lb, labels_.to(device))
 
             # Propagate backward (just compute gradients)
             iter_loss /= CONFIG.SOLVER.ITER_SIZE

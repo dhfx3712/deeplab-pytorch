@@ -13,6 +13,21 @@ https://blog.csdn.net/weixin_45377629/article/details/124237272
 
 
 
+torch.return_types.max(values=tensor([62,  6, 65]),indices=tensor([2, 3, 1]))
+torch.max返回2个值
+
+
+CrossEntropyLoss两种输入
+
+
+
+数组转image，resize到固定尺度(0-255像素，batch需要去掉)
+Image.fromarray(voc_array)
+
+
+
+
+
 
 
 
